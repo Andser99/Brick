@@ -1,0 +1,12 @@
+html * {
+    cursor: none;
+}
+body {
+    background-color: #cbc2ff;
+}
+.player {
+    background-color: darkmagenta;
+    border: inset 1px rgb(83, 0, 83);
+    position: fixed;
+    bottom: 50px;
+}
