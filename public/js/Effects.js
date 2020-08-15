@@ -1,70 +1,15 @@
-export class GameObject {
-    static objectCount = 0;
-    static getCount() {
-        return objectCount;
-    }
-    constructor(w, h, element) {
-        GameObject.objectCount++;
-        this.modList = new Array();
-        this.w = w;
-        this.h = h;
-        this.element = element;
-    }
-}
-
-export class Player extends GameObject {
-
-    constructor(w, h, element) {
-        super(w, h, element);
-        this.modList = new Array();
-        this.element.style.width = toPixels(w);
-        this.element.style.height = toPixels(h);
-        
-
-        this.handleMousemove = (event) => {
-            // console.log(`mouse position: ${event.x}:${event.y}`);
-            this.updatePos(event.x);
-        };
-        document.addEventListener('mousemove', this.handleMousemove);
-    }
-
-    updatePos(posX) {
-        var position = posX - this.w/2;
-        this.element.style.left = position + "px";
-    }
-
-    // DEPRECATED MOD HANDLING
-    // addMod(mod){
-    //     if (mod instanceof Modifier) {
-    //         this.modList.push(Modifier);
-    //         this.modList[this.modList.length].enable();
-    //     }
-    // }
-
-    // removeMod(){
-    //     //NYI
-    // }
-}
-
-export function toPixels(value) {
-    return value + "px";
-}
-
+import { GameObject } from './GameObject.js';
 
 //Decimal multiplier to size e.g. x1.1
 export function EnlargerEffect(multiplier) {
     var isEnabled = false;
     var enable = (gameObject) => {
-        gameObject.w = gameObject.w * multiplier;
-        gameObject.h = gameObject.h * multiplier;
-        gameObject.element.style.width = toPixels(gameObject.w);
-        gameObject.element.style.height = toPixels(gameObject.h);
+        gameObject.setW(gameObject.w * multiplier);
+        gameObject.setH(gameObject.h * multiplier);
     }
     var disable = (gameObject) => {
-        gameObject.w = gameObject.w / multiplier;
-        gameObject.h = gameObject.h / multiplier;
-        gameObject.element.style.width = toPixels(gameObject.w);
-        gameObject.element.style.height = toPixels(gameObject.h);
+        gameObject.setW(gameObject.w / multiplier);
+        gameObject.setH(gameObject.h / multiplier);
     }
     return {
         enable: (gameObject) => {
@@ -91,12 +36,10 @@ export function EnlargerEffect(multiplier) {
 export function WidenerEffect(multiplier) {
     var isEnabled = false;
     var enable = (gameObject) => {
-        gameObject.w = gameObject.w * multiplier;
-        gameObject.element.style.width = toPixels(gameObject.w);
+        gameObject.setW(gameObject.w * multiplier);
     }
     var disable = (gameObject) => {
-        gameObject.w = gameObject.w / multiplier;
-        gameObject.element.style.width = toPixels(gameObject.w);
+        gameObject.setW(gameObject.w / multiplier);
     }
     return {
         enable: (gameObject) => {
