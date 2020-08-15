@@ -61,6 +61,33 @@ export function WidenerEffect(multiplier) {
     }
 }
 
+export function BallSpeedEffect(multiplier) {
+    var isEnabled = false;
+    var enable = (gameObject) => {
+        gameObject.speed *= multiplier;
+    }
+    var disable = (gameObject) => {
+        gameObject.speed /= multiplier;
+    }
+    return {
+        enable: (gameObject) => {
+            if (!isEnabled) {
+                enable(gameObject);
+                isEnabled = true;
+                return true;
+            }
+            return false;
+        },
+        disable: (gameObject) => {
+            if (isEnabled){
+                disable(gameObject);
+                isEnabled = false;
+                return true;
+            }
+            return false;
+        }
+    }
+}
 // NYI
 // export function BounceSpeedMultiplier(multiplier) {
 //     return {

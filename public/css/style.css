@@ -20,14 +20,18 @@ body {
 }
 .brick {
     position: fixed;
-    background-color: blanchedalmond;
+    background-color: yellow;
     text-align: center;
-    border: inset 3px;
+    border: inset 6px yellow;
     vertical-align: middle;
     font-family: monospace;
     font-weight: bolder;
     color: black;
     font-size: 3em;
+    border-top-color: rgba(255, 255, 255, 0.4);
+    border-left-color: rgba(255, 255, 255, 0.4);
+    border-right-color: rgba(80, 80, 80, 0.2);
+    border-bottom-color: rgba(80, 80, 80, 0.2);
     
 }
 .score {

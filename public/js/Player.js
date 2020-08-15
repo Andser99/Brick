@@ -3,7 +3,7 @@ import { toPixels } from './Util.js';
 
 export class Player extends GameObject {
 
-    constructor(w, h, element, posX = 0, posY = 800) {
+    constructor(w, h, element, posX = 0, posY = 0) {
         super(w, h, element, posX, posY);
         this.score = 0;
         this.name = "Player";
