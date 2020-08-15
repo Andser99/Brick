@@ -89,26 +89,26 @@ export class Ball extends GameObject {
                         case('b'):
                             diffX = 1;
                             diffY = -1;
-                            offsetY = -this.vectorY/unit * this.speed * 1.05;
+                            // offsetY = -this.vectorY/unit * this.speed * 1.05;
                         break;
                         case('t'):
                             diffX = 1;
                             diffY = -1;
-                            offsetY = -this.vectorY/unit * this.speed * 1.05;
+                            // offsetY = -this.vectorY/unit * this.speed * 1.05;
                         break;
                         case('l'):
                             diffX = -1;
                             diffY = 1;
-                            offsetX = this.vectorX/unit * this.speed * 1.05;
+                            // offsetX = this.vectorX/unit * this.speed * 1.05;
                         break;
                         case('r'):
                             diffX = -1;
                             diffY = 1;
-                            offsetX = -this.vectorX/unit * this.speed * 1.05;
+                            // offsetX = -this.vectorX/unit * this.speed * 1.05;
                         break;
                         default:
-                            diffX = 1;
-                            diffY = 1;
+                            diffX = -1;
+                            diffY = -1;
                     }
 
                     obj.collide(this);
@@ -120,7 +120,8 @@ export class Ball extends GameObject {
                     else {
                         this.vectorX *= diffX;
                         this.vectorY *= diffY;
-                        this.setPos(prevX + offsetX, prevY + offsetY);
+                        // this.setPos(this.posX + (prevX - this.posX), this.posY + (prevY - this.posY));
+                        this.setPos(prevX + 2*(prevX - this.posX), prevY + 2*(prevY - this.posY));
                     }
                 }
             }

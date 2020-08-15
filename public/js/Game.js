@@ -31,12 +31,13 @@ function startGame() {
     var modB = new Modifier("Width1++", new WidenerEffect(2), player);
     var modC = new Modifier("Width2++", new WidenerEffect(1.75), player);
     
-    var ballA = new Ball("BallA", 3, 0.33, 1, 785, 50, 25, 25, container, player);
+    var ballA = new Ball("BallA", 5, 0.1, -1, 1600, 900, 20, 20, container, player);
     var modD = new Modifier("WidthBall++", new EnlargerEffect(2), ballA);
-    var ballB = new Ball("BallB", 4, 0.4, 1, 400, 700, 30, 30, container, player);
-    var ballC = new Ball("BallC", 3, 0.9, 1, 200, 900, 40, 40, container, player);
+    var ballB = new Ball("BallB", 4, 0.3, -1, 100, 700, 25, 25, container, player);
+    var ballC = new Ball("BallC", 3, 0.5, -1, 200, 900, 40, 40, container, player);
     var modE = new Modifier("SpeedBall++", new BallSpeedEffect(2), ballB);
 
+    var brick0 = new Brick(300, 100, document.getElementById("brick0"), 1100, 400, 15);
     var brick1 = new Brick(300, 100, document.getElementById("brick1"), 400, 400, 15);
     var brick2 = new Brick(100, 50, document.getElementById("brick2"), 200, 100, 4);
     var brick3 = new Brick(100, 50, document.getElementById("brick3"), 300, 100, 4);

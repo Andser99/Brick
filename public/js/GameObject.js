@@ -5,13 +5,13 @@ export class GameObject {
     static objectsArr = new Array();
 
     static removeItemFromArr(value) {
-        console.log(GameObject.objectsArr);
+        // console.log(GameObject.objectsArr);
         var index = GameObject.objectsArr.indexOf(value);
         if (index > -1) {
             GameObject.objectsArr.splice(index, 1);
         }
-        console.log("after reomval:");
-        console.log(GameObject.objectsArr);
+        // console.log("after reomval:");
+        // console.log(GameObject.objectsArr);
       }
 
     constructor(w, h, element, posX, posY) {

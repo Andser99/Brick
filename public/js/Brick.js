@@ -36,6 +36,7 @@ export class Brick extends GameObject {
 
     constructor(w, h, element, posX, posY, lifes) {
         super(w, h, element, posX, posY);
+        this.canBeHit = 0;
         this.posX = posX;
         this.posY = posY;
         this.element = element;
@@ -53,6 +54,10 @@ export class Brick extends GameObject {
         this.element.style.top = toPixels(posY+6);
     }
 
+    update() {
+        this.decreaseHit();
+    }
+
     setW(value) {
         this.w = value;
         if (this.element != undefined) {
@@ -68,27 +73,37 @@ export class Brick extends GameObject {
         }
     }
 
+    decreaseHit() {
+        if (this.canBeHit > 0) this.canBeHit--;
+    }
+
     collide(collider) {
-        this.lifes--;
-        this.element.innerHTML = this.lifes;
-        setTimeout(() => {
-            if (this.lifes > Brick.colorTable.length - 1) {
-                this.element.style.backgroundColor = Brick.colorTable[Brick.colorTable.length - 1].hit;
-                setTimeout(()=> {
-                    this.element.style.backgroundColor = Brick.colorTable[Brick.colorTable.length - 1].color;
-                }, 100)
+        if (this.canBeHit < 1) {
+            this.canBeHit += 3; //number of frames to ignore hits;
+            this.lifes--;
+            this.element.innerHTML = this.lifes;
+            setTimeout(() => {
+                if (this.lifes > Brick.colorTable.length - 1) {
+                    this.element.style.backgroundColor = Brick.colorTable[Brick.colorTable.length - 1].hit;
+                    setTimeout(()=> {
+                        this.element.style.backgroundColor = Brick.colorTable[Brick.colorTable.length - 1].color;
+                    }, 100)
+                }
+                else {
+                    this.element.style.backgroundColor = Brick.colorTable[this.lifes].hit;
+                    setTimeout(()=> {
+                        this.element.style.backgroundColor = Brick.colorTable[this.lifes].color;
+                    }, 100)
+                }
+            }, 0);
+            collider.owner.addScore(10);
+            if (this.lifes <= 0) {
+                this.element.style.display = "none";
+                GameObject.removeItemFromArr(this);
             }
-            else {
-                this.element.style.backgroundColor = Brick.colorTable[this.lifes].hit;
-                setTimeout(()=> {
-                    this.element.style.backgroundColor = Brick.colorTable[this.lifes].color;
-                }, 100)
-            }
-        }, 0);
-        collider.owner.addScore(10);
-        if (this.lifes <= 0) {
-            this.element.style.display = "none";
-            GameObject.removeItemFromArr(this);
+        }
+        else {
+            console.log("disabled hit");
         }
     }
 }
