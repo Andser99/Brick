@@ -41,9 +41,10 @@ export class Ball extends GameObject {
             this.vectorX = -this.vectorX;
             this.setPos(this.container.left, this.posY);
         }
-        if (this.posY + this.h + toY > this.container.bottom) {
+        if (this.posY + this.h/2 + toY > this.container.bottom) {
             this.vectorY = -this.vectorY;
-            this.setPos(this.container.right / 2, this.container.bottom - 100);
+            this.setPos(this.owner.posX + this.owner.w/2 - this.w/2, this.owner.posY - this.h - 5);
+            this.owner.addScore(-10);
         }
         if (this.posY + toY < this.container.top) {
             this.vectorY = -this.vectorY;
@@ -88,26 +89,22 @@ export class Ball extends GameObject {
                         case('b'):
                             diffX = 1;
                             diffY = -1;
-                            offsetY = -this.vectorY/unit * this.speed;
-                            console.log("bottom");
+                            offsetY = -this.vectorY/unit * this.speed * 1.05;
                         break;
                         case('t'):
                             diffX = 1;
                             diffY = -1;
-                            offsetY = -this.vectorY/unit * this.speed;
-                            console.log("top");
+                            offsetY = -this.vectorY/unit * this.speed * 1.05;
                         break;
                         case('l'):
                             diffX = -1;
                             diffY = 1;
-                            offsetX = this.vectorX/unit * this.speed;
-                            console.log("left");
+                            offsetX = this.vectorX/unit * this.speed * 1.05;
                         break;
                         case('r'):
                             diffX = -1;
                             diffY = 1;
-                            offsetX = -this.vectorX/unit * this.speed;
-                            console.log("right");
+                            offsetX = -this.vectorX/unit * this.speed * 1.05;
                         break;
                         default:
                             diffX = 1;
@@ -116,8 +113,9 @@ export class Ball extends GameObject {
 
                     obj.collide(this);
                     if (obj instanceof Player) {
+                        this.vectorX += 2*((this.posX + this.w/2) - (obj.posX + obj.w/2))/obj.w;
                         this.vectorY *= -1;
-                        this.posY = obj.posY - this.h;
+                        this.setPos(this.posX, obj.posY - this.h);
                     }
                     else {
                         this.vectorX *= diffX;
