@@ -1,6 +1,7 @@
 import { toPixels } from './Util.js';
 
 export class GameObject {
+
     static objectCount = 0;
     static objectsArr = new Array();
 
@@ -17,12 +18,11 @@ export class GameObject {
     constructor(w, h, element, posX, posY) {
         GameObject.objectCount++;
         GameObject.objectsArr.push(this);
-        this.modList = new Array();
-        this.w = w;
-        this.h = h;
+        this.element = element;
+        this.setW(w);
+        this.setH(h);
         this.posX = posX;
         this.posY = posY;
-        this.element = element;
     }
 
     collide(collider) {}
@@ -42,4 +42,9 @@ export class GameObject {
             this.element.style.height = toPixels(this.h);
         }
     }
+
+    /*setPosScaled(x, y) {
+        this.element.style.top = toPixels(y * GameObject.scaleCoeff.h);
+        this.element.style.left = toPixels(x * GameObject.scaleCoeff.w);
+    }*/
 }

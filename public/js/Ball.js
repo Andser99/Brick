@@ -26,8 +26,6 @@ export class Ball extends GameObject {
         this.element.style.backgroundColor = this.color;
     }
 
-
-
     update() {
         var unit = Math.sqrt(this.vectorX*this.vectorX + this.vectorY*this.vectorY);
         // console.log(this.container.left);

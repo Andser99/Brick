@@ -44,12 +44,7 @@ export class Brick extends GameObject {
     constructor(w, h, element, posX, posY, lifes) {
         super(w, h, element, posX, posY);
         this.canBeHit = 0;
-        this.posX = posX;
-        this.posY = posY;
-        this.element = element;
         this.lifes = lifes;
-        this.setW(w);
-        this.setH(h);
         if (lifes > Brick.colorTable.length - 1) {
             this.element.style.backgroundColor = Brick.colorTable[Brick.colorTable.length - 1].color;
         }

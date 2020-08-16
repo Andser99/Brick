@@ -7,11 +7,9 @@ export class Player extends GameObject {
         super(w, h, element, posX, posY);
         this.score = 0;
         this.name = "Player";
-        this.modList = new Array();
         this.element.style.width = toPixels(w-12);
         this.element.style.height = toPixels(h-12);
         this.element.style.top = toPixels(posY);
-        this.posX = posX;
         this.scoreElement = scoreElement;
         
 

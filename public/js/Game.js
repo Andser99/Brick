@@ -18,13 +18,12 @@ function startGame() {
     container.bottom = window.innerHeight
     || document.documentElement.clientHeight
     || document.body.clientHeight;
+    console.log(container.right + " " + container.bottom);
     container.top = 0;
-
-
 
     //Initialize player
     const playerElement = document.getElementById("player");
-    const player = new Player(100, 10, playerElement, 0, container.bottom - 70, document.getElementById("player_score"));
+    const player = new Player(100, 15, playerElement, 0, container.bottom - 70, document.getElementById("player_score"));
 
     //Test mod
     var modA = new Modifier("UniversalScale++", new EnlargerEffect(3), player);
