@@ -55,3 +55,18 @@ body {
     color: mediumpurple;
     font-family: monospace;
 }
+.blinking {
+    animation: blinker 0.3s linear infinite;
+    border-color: black;
+    border-width: 1px;
+}
+
+@keyframes blinker {
+    50% {
+      opacity: 0.3;
+      background-color: orange;
+    }
+    0% {
+        background-color: red;
+    }
+  }

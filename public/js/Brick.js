@@ -6,30 +6,37 @@ export class Brick extends GameObject {
     static colorTable = new Array(
         {
             color: "red",
+            text: "black",
             hit: "darkred"
         },
         {
             color: "blue",
+            text: "black",
             hit: "darkblue"
         },
         {
             color: "lawngreen",
+            text: "black",
             hit: "limegreen"
         },
         {
             color: "yellow",
+            text: "black",
             hit: "orange"
         },
         {
             color: "pink",
+            text: "black",
             hit: "lightpink"
         },
         {
             color: "black",
+            text: "white",
             hit: "dimgray"
         },
         {
             color: "white",
+            text: "black",
             hit: "lavenderblush"
         }
         );
@@ -82,25 +89,28 @@ export class Brick extends GameObject {
             this.canBeHit += 3; //number of frames to ignore hits;
             this.lifes--;
             this.element.innerHTML = this.lifes;
-            setTimeout(() => {
-                if (this.lifes > Brick.colorTable.length - 1) {
-                    this.element.style.backgroundColor = Brick.colorTable[Brick.colorTable.length - 1].hit;
-                    setTimeout(()=> {
-                        this.element.style.backgroundColor = Brick.colorTable[Brick.colorTable.length - 1].color;
-                    }, 100)
-                }
-                else {
-                    this.element.style.backgroundColor = Brick.colorTable[this.lifes].hit;
-                    setTimeout(()=> {
-                        this.element.style.backgroundColor = Brick.colorTable[this.lifes].color;
-                    }, 100)
-                }
-            }, 0);
-            collider.owner.addScore(10);
             if (this.lifes <= 0) {
                 this.element.style.display = "none";
                 GameObject.removeItemFromArr(this);
+            } else {
+                setTimeout(() => {
+                    if (this.lifes > Brick.colorTable.length) {
+                        this.element.style.backgroundColor = Brick.colorTable[Brick.colorTable.length - 1].hit;
+                        this.element.style.color = Brick.colorTable[Brick.colorTable.length - 1].text;
+                        setTimeout(()=> {
+                            this.element.style.backgroundColor = Brick.colorTable[Brick.colorTable.length - 1].color;
+                        }, 100)
+                    }
+                    else {
+                        this.element.style.backgroundColor = Brick.colorTable[this.lifes - 1].hit;
+                        this.element.style.color = Brick.colorTable[this.lifes - 1].text;
+                        setTimeout(()=> {
+                            this.element.style.backgroundColor = Brick.colorTable[this.lifes - 1].color;
+                        }, 100)
+                    }
+                }, 0);
             }
+            collider.owner.addScore(10);
         }
         else {
             console.log("disabled hit");

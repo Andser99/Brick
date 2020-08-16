@@ -11,12 +11,19 @@ export class Ball extends GameObject {
         this.vectorY = vectorY;
         this.container = container;
         this.owner = owner;
+        this.color = "";
         this.element = document.createElement("div");
         this.element.className = "ball";
         this.element.style.width = toPixels(w);
         this.element.style.height = toPixels(h);
         this.container.appendChild(this.element);
+        this.setColor("red");
         this.update();
+    }
+
+    setColor(value) {
+        this.color = value;
+        this.element.style.backgroundColor = this.color;
     }
 
 
@@ -45,11 +52,21 @@ export class Ball extends GameObject {
             this.vectorY = -this.vectorY;
             this.setPos(this.owner.posX + this.owner.w/2 - this.w/2, this.owner.posY - this.h - 5);
             this.owner.addScore(-10);
+            this.flashOnDeath();
         }
         if (this.posY + toY < this.container.top) {
             this.vectorY = -this.vectorY;
             this.setPos(this.posX, this.container.top);
         }
+    }
+
+    flashOnDeath() {
+        setTimeout(() => {
+            this.element.classList.add("blinking");
+            setTimeout(() => {
+                this.element.classList.remove("blinking");
+            }, 1200);
+        }, 0);
     }
 
     checkCollision() {
