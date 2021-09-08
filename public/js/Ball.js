@@ -1,8 +1,16 @@
 import { GameObject } from './GameObject.js';
 import { toPixels } from './Util.js';
 import { Player } from './Player.js';
+import { Brick } from './Brick.js';
 
 export class Ball extends GameObject {
+
+    //Total trail duration is TRAIL_DURATION * TRAIL_PERIOD in [ms]
+    //Number of iterations of trail ball creation
+    static TRAIL_ITERATIONS = 20;
+    //Period in [ms] for balls to change alpha
+    static TRAIL_PERIOD = 16.667;
+
     constructor(name, speed, vectorX, vectorY, posX, posY, w, h, container, owner) {
         super(w, h, undefined, posX, posY);
         this.name = name;
@@ -26,9 +34,61 @@ export class Ball extends GameObject {
         this.element.style.backgroundColor = this.color;
     }
 
+    trailingFadeFunction(i) {
+        // let res = Math.sqrt(0.25 - i/Ball.TRAIL_ITERATIONS / 4);
+        // if (i < 5) return 0.3;
+        let res = Math.sqrt((1 - i/Ball.TRAIL_ITERATIONS) / 8);
+        // let res = (1 - i/Ball.TRAIL_ITERATIONS) / 2;
+        return res;
+    }
 
+    createTrailingImage() {
+        let trailBall = document.createElement("div");
+        trailBall.className = "ball";
+        trailBall.style.width = toPixels(this.w);
+        trailBall.style.height = toPixels(this.h);
+        trailBall.style.left = toPixels(this.posX);
+        trailBall.style.top = toPixels(this.posY);
+        trailBall.style.backgroundColor = this.color;
+        trailBall.style.opacity = 0.5;
+        this.container.appendChild(trailBall);
+        for (let i = 1; i < Ball.TRAIL_ITERATIONS; i++) {
+            setTimeout(() => {
+                trailBall.style.opacity = `${this.trailingFadeFunction(i)}`;
+                //Recenter ball and shrink, recentering is necessary since elements are anchored
+                //to the top left corner
+                let currentX = parseInt(trailBall.style.left.split("px"));
+                let currentY = parseInt(trailBall.style.top.split("px"));
+                let prevWidth = parseInt(trailBall.style.width.split("px"));
+                let prevHeight = parseInt(trailBall.style.height.split("px"));
+                // let newWidth = prevWidth * 0.8;
+                // let newHeight = prevHeight * 0.8;
+                let newWidth = prevWidth - this.w / Ball.TRAIL_ITERATIONS;
+                let newHeight = prevHeight - this.h / Ball.TRAIL_ITERATIONS;
+                let deltaX = Math.abs((prevWidth - newWidth) / 2);
+                let deltaY = Math.abs((prevHeight - newHeight) / 2);
+
+                //magic +0.5 which makes every other ball snap to the next pixel
+                //when rounding (since pixels picked to draw are probably floored) creating a smoother trajectory
+                trailBall.style.left = toPixels(currentX + deltaX + 0.5);
+                trailBall.style.top = toPixels(currentY + deltaY);
+
+                trailBall.style.width = toPixels(newWidth);
+                trailBall.style.height = toPixels(newHeight);
+            }, i*Ball.TRAIL_PERIOD);
+        }
+        setTimeout(() => {this.container.removeChild(trailBall)}, Ball.TRAIL_ITERATIONS * Ball.TRAIL_PERIOD + Ball.TRAIL_PERIOD);
+    }
 
     update() {
+        if (GameObject.gameIteration % Math.floor(this.h / 10) == 0)
+            this.createTrailingImage();
+        if (this.type == "manual"){
+            this.setPos(this.posX, this.posY);
+            this.checkCollision();
+            console.log(`X:${this.posX} Y:${this.posY}`);
+            return;
+        }
         var unit = Math.sqrt(this.vectorX*this.vectorX + this.vectorY*this.vectorY);
         // console.log(this.container.left);
         var moveX = this.vectorX/unit * this.speed;
@@ -74,8 +134,10 @@ export class Ball extends GameObject {
         var unit = Math.sqrt(this.vectorX*this.vectorX + this.vectorY*this.vectorY);
         var prevX = this.posX;
         var prevY = this.posY;
-        this.posX += this.vectorX/unit * this.speed;
-        this.posY += this.vectorY/unit * this.speed;
+        if (this.type != "manual"){
+            this.posX += this.vectorX/unit * this.speed;
+            this.posY += this.vectorY/unit * this.speed;
+        }
         for (var i = 0; i < GameObject.objectsArr.length; i++) {
             var obj = GameObject.objectsArr[i];
             if (!(obj instanceof Ball)) {
@@ -127,7 +189,6 @@ export class Ball extends GameObject {
                             diffX = -1;
                             diffY = -1;
                     }
-
                     obj.collide(this);
                     if (obj instanceof Player) {
                         this.vectorX += 2*((this.posX + this.w/2) - (obj.posX + obj.w/2))/obj.w;
@@ -138,7 +199,7 @@ export class Ball extends GameObject {
                         this.vectorX *= diffX;
                         this.vectorY *= diffY;
                         // this.setPos(this.posX + (prevX - this.posX), this.posY + (prevY - this.posY));
-                        this.setPos(prevX + 2*(prevX - this.posX), prevY + 2*(prevY - this.posY));
+                        this.setPos(prevX + 1.5*(prevX - this.posX), prevY + 1.5*(prevY - this.posY));
                     }
                 }
             }

@@ -3,6 +3,7 @@ import { toPixels } from './Util.js';
 export class GameObject {
     static objectCount = 0;
     static objectsArr = new Array();
+    static gameIteration = 0;
 
     static removeItemFromArr(value) {
         // console.log(GameObject.objectsArr);

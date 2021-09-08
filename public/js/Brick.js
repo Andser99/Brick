@@ -3,6 +3,27 @@ import { toPixels } from './Util.js';
 
 export class Brick extends GameObject {
 
+    //Number of frames the brick won't register hit events after a collision (collision still works, only for counting lifes)
+    static GLOBAL_FRAME_HIT_COOLDOWN = 2;
+
+    //Max 8 sound pitches are implemented;
+    static GLOBAL_COUNT_SOUND_VARIETIES = 4;
+    static sound = (obj) => {
+        // new Audio("../sound/dong" + Math.floor(Math.random()*8) + ".mp3").play();
+        let path = "../sound/dong" + ((obj.lifes > 7 ? 8 : obj.lifes) - 1) + ".mp3";
+        console.log(path);
+        new Audio(path).play();
+    }
+
+    static mouseDown = 0;
+    static docInit(document) {
+        document.body.onmousedown = function() { 
+        Brick.mouseDown = true;
+        }
+        document.body.onmouseup = function() {
+        Brick.mouseDown = false;
+    }
+    }
     static colorTable = new Array(
         {
             color: "red",
@@ -57,8 +78,9 @@ export class Brick extends GameObject {
             this.element.style.backgroundColor = Brick.colorTable[this.lifes].color;
         }
         this.element.innerHTML = this.lifes;
-        this.element.style.left = toPixels(posX+6);
-        this.element.style.top = toPixels(posY+6);
+        this.element.style.left = toPixels(posX);
+        this.element.style.top = toPixels(posY);
+        this.soundIsPlayed = false;
     }
 
     update() {
@@ -70,7 +92,7 @@ export class Brick extends GameObject {
         if (this.element != undefined) {
             this.element.style.width = toPixels(this.w-12);
         }
-        this.w = value + 6;
+        this.w = value;
     }
 
     setH(value) {
@@ -78,6 +100,7 @@ export class Brick extends GameObject {
         if (this.element != undefined) {
             this.element.style.height = toPixels(this.h-12);
         }
+        this.h = value;
     }
 
     decreaseHit() {
@@ -86,8 +109,21 @@ export class Brick extends GameObject {
 
     collide(collider) {
         if (this.canBeHit < 1) {
-            this.canBeHit += 3; //number of frames to ignore hits;
-            this.lifes--;
+            if (collider.type == "manual") {
+                if (!this.soundIsPlayed && Brick.mouseDown)
+                    Brick.sound(this);
+                if (Brick.mouseDown) {
+                    this.soundIsPlayed = true;
+                }
+                else {
+                    this.soundIsPlayed = false;
+                }
+            }
+            else {
+                Brick.sound(this);
+            }
+            this.canBeHit += Brick.GLOBAL_FRAME_HIT_COOLDOWN; //number of frames to ignore hits;
+            this.lifes -= collider.type == "manual" ? 0 : 1;
             this.element.innerHTML = this.lifes;
             if (this.lifes <= 0) {
                 this.element.style.display = "none";
