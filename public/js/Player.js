@@ -15,11 +15,30 @@ export class Player extends GameObject {
         this.scoreElement = scoreElement;
         
 
-        this.handleMousemove = (event) => {
-            // console.log(`mouse position: ${event.x}:${event.y}`);
-            this.updatePos(event.x);
-        };
-        document.addEventListener('mousemove', this.handleMousemove);
+        // this.handleMousemove = (event) => {
+        //     // console.log(`mouse position: ${event.x}:${event.y}`);
+        //     this.updatePos(event.x);
+        // };
+        // document.addEventListener('mousemove', this.handleMousemove);
+    }
+
+    updateMouse(e) {
+        if (this.posX + e.movementX > -6 && this.posX + this.w + e.movementX < 1914) {
+            this.posX += e.movementX;
+            this.element.style.left = toPixels(this.posX+6);
+            this.element.style.top = toPixels(this.posY);
+        } else if (this.posX < 400 && e.movementX < 0) {
+            console.log("left edge snap");
+            this.posX = -6;
+            this.element.style.left = toPixels(this.posX+6);
+            this.element.style.top = toPixels(this.posY);
+        } else if (this.posX > 1500 && e.movementX > 0) {
+            console.log("right edge snap");
+            this.posX = 1914 - this.w;
+            this.element.style.left = toPixels(this.posX+6);
+            this.element.style.top = toPixels(this.posY);
+
+        }
     }
 
     updatePos(posX) {

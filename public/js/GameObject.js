@@ -26,6 +26,8 @@ export class GameObject {
         this.element = element;
     }
 
+    updateMouse(e) {}
+
     collide(collider) {}
 
     update() {}

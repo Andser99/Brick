@@ -80,13 +80,18 @@ export class Ball extends GameObject {
         setTimeout(() => {this.container.removeChild(trailBall)}, Ball.TRAIL_ITERATIONS * Ball.TRAIL_PERIOD + Ball.TRAIL_PERIOD);
     }
 
+    updateMouse(e) {
+        this.posX += e.movementX;
+        this.posY += e.movementY;
+        this.setPos(this.posX, this.posY);
+    }
+
     update() {
         if (GameObject.gameIteration % Math.floor(this.h / 10) == 0)
             this.createTrailingImage();
         if (this.type == "manual"){
             this.setPos(this.posX, this.posY);
             this.checkCollision();
-            console.log(`X:${this.posX} Y:${this.posY}`);
             return;
         }
         var unit = Math.sqrt(this.vectorX*this.vectorX + this.vectorY*this.vectorY);
@@ -149,19 +154,43 @@ export class Ball extends GameObject {
                 // console.log(obj.posY + " " + this.posY + " " + this.h);
                 if (this.posX + this.w > obj.posX && this.posX < obj.posX + obj.w && this.posY + this.h > obj.posY && this.posY < obj.posY + obj.h) {
                     //collision side check with intersection depth
-                    var dx=(this.posX+this.w/2)-(obj.posX+obj.w/2);
-                    var dy=(this.posY+this.h/2)-(obj.posY+obj.h/2);
-                    var width=(this.w+obj.w)/2;
-                    var height=(this.h+obj.h)/2;
-                    var crossWidth=width*dy;
-                    var crossHeight=height*dx;
-                    var collision='none';
-                    if(Math.abs(dx)<=width && Math.abs(dy)<=height){
-                        if(crossWidth>crossHeight){
-                            collision=(crossWidth>(-crossHeight))?'b':'l';
-                        }else{
-                            collision=(crossWidth>-(crossHeight))?'r':'t';
+                    var dx = (this.posX+this.w/2)-(obj.posX+obj.w/2); //position difference   along the x axis
+                    var dy = (this.posY+this.h/2)-(obj.posY+obj.h/2); //                      along the y axis
+                    var width = (this.w+obj.w)/2;
+                    var height = (this.h+obj.h)/2;
+
+                    //Multiply crossheight by the distance vector square which increases
+                    //the crosswidth "weight" in the corresponding distance, creating
+                    //more natural bounces in that direction
+                    var crossWidth = width*dy * Math.pow(this.vectorY, 2);
+                    var crossHeight = height*dx * Math.pow(this.vectorX, 2);
+                    var collision = 'none';
+                    //Letters indicate the side of the object that was hit, not the ball
+                    if(Math.abs(dx) <= width && Math.abs(dy) <= height){
+                        if (this.vectorX > 0 && this.vectorY > 0) {
+                            collision = crossWidth > crossHeight ? 'l' : 't';
+                            console.log(`left top ${collision}`);
                         }
+                        if (this.vectorX < 0 && this.vectorY > 0) {
+                            collision = crossWidth>-(crossHeight) ? 'r' : 't';
+                            console.log(`right top ${collision}`);
+                        }
+                        if (this.vectorX < 0 && this.vectorY < 0) {
+                            collision = crossWidth > crossHeight ? 'b' : 'r';
+                            console.log(`bottom right ${collision}`);
+                        }
+                        if (this.vectorX > 0 && this.vectorY < 0) {
+                            collision = (crossWidth>-(crossHeight)) ? 'b' : 'l';
+                            console.log(`bottom left ${collision}`);
+                        }
+                        //Old bounce check, doesn't account for the direction of the ball
+                        //e.g. a ball moving down and right could bounce from the right wall
+                        //the right wall could never be hit from that direction of movement
+                        // if(crossWidth > crossHeight) {
+                        //     collision = (crossWidth>-(crossHeight))?'b':'l';
+                        // } else {
+                        //     collision = (crossWidth>-(crossHeight))?'r':'t';
+                        // }
                     }
 
                     switch(collision) {
@@ -189,7 +218,6 @@ export class Ball extends GameObject {
                             diffX = -1;
                             diffY = -1;
                     }
-                    obj.collide(this);
                     if (obj instanceof Player) {
                         this.vectorX += 2*((this.posX + this.w/2) - (obj.posX + obj.w/2))/obj.w;
                         this.vectorY *= -1;
@@ -198,9 +226,26 @@ export class Ball extends GameObject {
                     else {
                         this.vectorX *= diffX;
                         this.vectorY *= diffY;
-                        // this.setPos(this.posX + (prevX - this.posX), this.posY + (prevY - this.posY));
-                        this.setPos(prevX + 1.5*(prevX - this.posX), prevY + 1.5*(prevY - this.posY));
+                        switch(collision) {
+                            case('t'):
+                                this.setPos(prevX + 2*(prevX - this.posX), obj.posY - this.h);
+                                break;
+                            case('b'):
+                                this.setPos(prevX + 2*(prevX - this.posX), obj.posY + obj.h);
+                                break;
+                            case('l'):
+                                this.setPos(obj.posX - this.w, prevY + 2*(prevY - this.posY));
+                                break;
+                            case('r'):
+                                this.setPos(obj.posX + obj.w, prevY + 2*(prevY - this.posY));
+                                break;
+                            // default:
+                            //     this.setPos(this.posX + (prevX - this.posX), this.posY + (prevY - this.posY));
+                        }
                     }
+                    obj.collide(this);
+                //return here if only the first collision found should count
+                break;
                 }
             }
         }

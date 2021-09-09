@@ -5,6 +5,42 @@ import { Brick } from './Brick.js';
 import { Ball } from './Ball.js';
 
 
+var cursorX = 50;
+var cursorY = 50;
+var mouseControllableList = new Array();
+
+function updatePosition(e) {
+    for (let x of mouseControllableList) {
+        x.updateMouse(e);
+    }
+    cursorX += e.movementX;
+    cursorY += e.movementY;
+}
+
+function initPointerLock() {
+    document.addEventListener('pointerlockchange', lockChangeAlert, false);
+    document.addEventListener('mozpointerlockchange', lockChangeAlert, false);
+
+    function lockChangeAlert() {
+        if (document.pointerLockElement === canvas ||
+            document.mozPointerLockElement === canvas) {
+            console.log('Pointer locked');
+            document.addEventListener("mousemove", updatePosition, false);
+        } else {
+            console.log('Pointer unlocked');
+            document.removeEventListener("mousemove", updatePosition, false);
+        }
+    }
+
+    var canvas = document.getElementById("canvas");
+    canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
+
+    document.exitPointerLock = document.exitPointerLock || document.mozExitPointerLock;
+
+    canvas.onclick = function() {
+        canvas.requestPointerLock();
+    };
+}
 
 function startGame() {
     document.addEventListener('contextmenu', function (e) {
@@ -14,39 +50,40 @@ function startGame() {
     var container = document.getElementById("game_container");
     container.left = 0;
     container.right = window.innerWidth
-    || document.documentElement.clientWidth
-    || document.body.clientWidth;
+        || document.documentElement.clientWidth
+        || document.body.clientWidth;
     container.bottom = window.innerHeight
-    || document.documentElement.clientHeight
-    || document.body.clientHeight;
+        || document.documentElement.clientHeight
+        || document.body.clientHeight;
     container.top = 0;
     Brick.docInit(document);
-    
+    initPointerLock();
+        
 
 
 
     //Initialize player
     const playerElement = document.getElementById("player");
-    const player = new Player(100, 10, playerElement, 0, container.bottom - 70, document.getElementById("player_score"));
+    const player = new Player(100, 10, playerElement, 0, container.bottom - 70, document.getElementById("player_score"), cursorX);
+    mouseControllableList.push(player);
 
     //Test mod
     var modA = new Modifier("UniversalScale++", new EnlargerEffect(3), player);
     var modB = new Modifier("Width1++", new WidenerEffect(2), player);
     var modC = new Modifier("Width2++", new WidenerEffect(1.75), player);
     
-    var ballA = new Ball("BallA", 5, 0.1, -1, 1600, 900, 20, 20, container, player);
+    var ballA = new Ball("BallA", 15, 0.1, -1, 1300, 900, 10, 10, container, player);
     var modD = new Modifier("WidthBall++", new EnlargerEffect(2), ballA);
-    var ballB = new Ball("BallB", 4, 0.3, -1, 100, 700, 25, 25, container, player);
-    var ballC = new Ball("BallC", 3, 0.5, -1, 200, 900, 40, 40, container, player);
-    var modE = new Modifier("SpeedBall++", new BallSpeedEffect(2), ballB);
+    
+    // var ballB = new Ball("BallB", 4, 0.3, -1, 100, 700, 25, 25, container, player);
+    // var modE = new Modifier("SpeedBall++", new BallSpeedEffect(2), ballB);
+    
+    // var ballC = new Ball("BallC", 3, 0.5, -1, 200, 900, 40, 40, container, player);
 
 
     // var ballManual = new Ball("BallManual", 0, 0, 0, 300, 900, 25, 25, container, player);
-    // document.addEventListener('mousemove', (e) => {
-    //     ballManual.posX = e.x;
-    //     ballManual.posY = e.y;
-    // });
     // ballManual.type = "manual";
+    // mouseControllableList.push(ballManual);
 
     var brick0 = new Brick(400, 50, document.getElementById("brick0"), 1050, 400, 32);
     var brick1 = new Brick(400, 50, document.getElementById("brick1"), 350, 400, 32);
