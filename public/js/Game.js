@@ -85,8 +85,8 @@ function startGame() {
     // ballManual.type = "manual";
     // mouseControllableList.push(ballManual);
 
-    var brick0 = new Brick(400, 50, document.getElementById("brick0"), 1050, 400, 32);
-    var brick1 = new Brick(400, 50, document.getElementById("brick1"), 350, 400, 32);
+    var brick0 = new Brick(400, 50, document.getElementById("brick0"), 1050, 400, 32, 0.2);
+    var brick1 = new Brick(400, 50, document.getElementById("brick1"), 350, 400, 32, 0.5);
     var brick2 = new Brick(100, 50, document.getElementById("brick2"), 200, 100, 4);
     var brick3 = new Brick(100, 50, document.getElementById("brick3"), 300, 100, 4);
     var brick4 = new Brick(100, 50, document.getElementById("brick4"), 400, 100, 4);

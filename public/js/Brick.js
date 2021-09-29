@@ -1,4 +1,5 @@
 import { GameObject } from './GameObject.js';
+import { PowerUp } from './PowerUp.js';
 import { toPixels } from './Util.js';
 
 export class Brick extends GameObject {
@@ -8,6 +9,7 @@ export class Brick extends GameObject {
 
     //Max 8 sound pitches are implemented;
     static GLOBAL_COUNT_SOUND_VARIETIES = 4;
+
     static sound = (obj) => {
         // new Audio("../sound/dong" + Math.floor(Math.random()*8) + ".mp3").play();
         let path = "../sound/dong" + ((obj.lifes > 7 ? 8 : obj.lifes) - 1) + ".mp3";
@@ -62,13 +64,14 @@ export class Brick extends GameObject {
         }
         );
 
-    constructor(w, h, element, posX, posY, lifes) {
+    constructor(w, h, element, posX, posY, lifes, powerUpChance) {
         super(w, h, element, posX, posY);
         this.canBeHit = 0;
         this.posX = posX;
         this.posY = posY;
         this.element = element;
         this.lifes = lifes;
+        this.powerUpChance = (powerUpChance == null ? 2 : powerUpChance);
         this.setW(w);
         this.setH(h);
         if (lifes > Brick.colorTable.length - 1) {
@@ -128,6 +131,7 @@ export class Brick extends GameObject {
             if (this.lifes <= 0) {
                 this.element.style.display = "none";
                 GameObject.removeItemFromArr(this);
+                if (Math.random() >= this.powerUpChance) new PowerUp(this.posX, this.posY);
             } else {
                 setTimeout(() => {
                     if (this.lifes > Brick.colorTable.length) {
