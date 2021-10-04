@@ -1,5 +1,38 @@
 var debug = false;
 
+window.originalSetInterval = window.setInterval;
+window.originalClearInterval = window.clearInterval;
+window.activeIntervals = 0;
+var runningIntervals = [];
+window.setInterval = function (func, delay)
+{
+    var newInterval;
+    if(func && delay){
+        newInterval = window.originalSetInterval(func,delay);
+        runningIntervals.push(newInterval);
+    }
+    if (debug) console.log(runningIntervals);
+    return newInterval;
+};
+window.clearInterval = function (intervalId)
+{
+    // JQuery sometimes hands in true which doesn't count
+    var oldInterval;
+    if(intervalId !== true){
+        oldInterval = window.originalClearInterval(intervalId);
+        var toRemove = undefined;
+        for (let i = 0; i < runningIntervals.length; i++) {
+            if (runningIntervals[i] == intervalId) {
+                toRemove = i;
+                break;
+            }
+        }
+        runningIntervals.splice(toRemove, 1);
+    }
+    if (debug) console.log(runningIntervals);
+    return oldInterval;
+};
+
 const GRID_WIDTH = 11;
 const GRID_HEIGHT = 11;
 const IMAGE_SIZE = 48;
@@ -40,13 +73,18 @@ const RESET_BUTTON = document.createElement("button");
 RESET_BUTTON.innerText = "Reset";
 document.body.appendChild(RESET_BUTTON);
 RESET_BUTTON.addEventListener("click", (e) => {
-    window.location.reload(true);
+    while(runningIntervals.length > 0) {
+        clearInterval(runningIntervals[0]);
+    }
 
-    // running = false;
-    // document.removeEventListener('keydown',checkKey);
-    // missiles = [];
-    // ship = [104,114,115,116];
-    // aliens = [1,3,5,7,9,23,25,27,29,31];
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    level = 1;
+    speed = 512;
+    running = false;
+    document.removeEventListener('keydown', checkKey);
+    missiles = [];
+    ship = [104,114,115,116];
+    aliens = [1,3,5,7,9,23,25,27,29,31];
 });
 
 // Toggle music
