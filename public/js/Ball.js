@@ -130,7 +130,7 @@ export class Ball extends GameObject {
             this.element.classList.add("blinking");
             setTimeout(() => {
                 this.element.classList.remove("blinking");
-            }, 1200);
+            }, 500);
         }, 0);
     }
 

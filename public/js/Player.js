@@ -41,6 +41,11 @@ export class Player extends GameObject {
         }
     }
 
+    updateEye(e) {
+        this.posX = e.x - this.w / 2;
+        this.element.style.left = toPixels(this.posX);
+    }
+
     updatePos(posX) {
         this.posX = posX;
         // var position = posX - this.w/2; //center to mouse

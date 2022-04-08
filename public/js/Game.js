@@ -8,6 +8,7 @@ import { Ball } from './Ball.js';
 var cursorX = 50;
 var cursorY = 50;
 var mouseControllableList = new Array();
+var eyeControllableList = new Array();
 
 function updatePosition(e) {
     for (let x of mouseControllableList) {
@@ -43,10 +44,18 @@ function initPointerLock() {
 }
 
 function startGame() {
+    // webgazer.begin();
+    webgazer.setGazeListener(function(data, elapsedTime) {
+        if (data == null) {
+            return;
+        }
+        eyeX = data.x; //these x coordinates are relative to the viewport
+    }).begin();
+
     document.addEventListener('contextmenu', function (e) {
         e.preventDefault();
     }, false);
-    document.documentElement.style.cursor = 'none';
+    // document.documentElement.style.cursor = 'none';
     var container = document.getElementById("game_container");
     container.left = 0;
     container.right = window.innerWidth
@@ -57,7 +66,7 @@ function startGame() {
         || document.body.clientHeight;
     container.top = 0;
     Brick.docInit(document);
-    initPointerLock();
+    // initPointerLock();
         
 
 
@@ -65,14 +74,15 @@ function startGame() {
     //Initialize player
     const playerElement = document.getElementById("player");
     const player = new Player(100, 10, playerElement, 0, container.bottom - 70, document.getElementById("player_score"), cursorX);
-    mouseControllableList.push(player);
+    // mouseControllableList.push(player);
+    eyeControllableList.push(player);
 
     //Test mod
     var modA = new Modifier("UniversalScale++", new EnlargerEffect(3), player);
     var modB = new Modifier("Width1++", new WidenerEffect(2), player);
     var modC = new Modifier("Width2++", new WidenerEffect(1.75), player);
     
-    var ballA = new Ball("BallA", 15, 0.1, -1, 1300, 900, 10, 10, container, player);
+    var ballA = new Ball("BallA", 7, 0.1, -1, 1300, 900, 10, 10, container, player);
     var modD = new Modifier("WidthBall++", new EnlargerEffect(2), ballA);
     
     // var ballB = new Ball("BallB", 4, 0.3, -1, 100, 700, 25, 25, container, player);
@@ -178,7 +188,27 @@ function startGame() {
         }
     });
 
+    let eyeX = 0;
+    let eyeArr = new Array();
+    let realEyeX = 0;
+
+    function handleEyeDrift() {
+        eyeArr.push(eyeX);
+        if (eyeArr.length > 20) {
+            eyeArr.shift();
+        }
+
+        let total = 0;
+        for (let x of eyeArr) {
+            total += x;
+        }
+        realEyeX = total/eyeArr.length;
+        console.log(realEyeX);
+    }
+
     function updateGameState() {
+        handleEyeDrift();
+        eyeControllableList.forEach(_ => _.updateEye({"x": realEyeX}));
         GameObject.gameIteration = (GameObject.gameIteration + 1) % Number.MAX_SAFE_INTEGER;
         for (var i = 0; i < GameObject.objectsArr.length; i++) {
             GameObject.objectsArr[i].update();
