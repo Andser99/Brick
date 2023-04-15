@@ -10,11 +10,13 @@ export class Ball extends GameObject {
     static TRAIL_ITERATIONS = 20;
     //Period in [ms] for balls to change alpha
     static TRAIL_PERIOD = 16.667;
+    static GRAVITY = 0.09;
 
-    constructor(name, speed, vectorX, vectorY, posX, posY, w, h, container, owner) {
+    constructor(name, speedX, speedY, vectorX, vectorY, posX, posY, w, h, container, owner) {
         super(w, h, undefined, posX, posY);
         this.name = name;
-        this.speed = speed;
+        this.speedX = speedX;
+        this.speedY = speedY;
         this.vectorX = vectorX;
         this.vectorY = vectorY;
         this.container = container;
@@ -27,6 +29,14 @@ export class Ball extends GameObject {
         this.container.appendChild(this.element);
         this.setColor("red");
         this.update();
+    }
+
+    onclick(e) {
+        if (this.speedX == 0 && this.speedY == 0) {
+            this.speedY = 3;
+            this.vectorY = 1;
+            this.posY = this.posY + this.owner.h + this.h;
+        }
     }
 
     setColor(value) {
@@ -43,6 +53,7 @@ export class Ball extends GameObject {
     }
 
     createTrailingImage() {
+        if (this.speedX + this.speedY == 0) return;
         let trailBall = document.createElement("div");
         trailBall.className = "ball";
         trailBall.style.width = toPixels(this.w);
@@ -89,15 +100,22 @@ export class Ball extends GameObject {
     update() {
         if (GameObject.gameIteration % Math.floor(this.h / 10) == 0)
             this.createTrailingImage();
-        if (this.type == "manual"){
-            this.setPos(this.posX, this.posY);
-            this.checkCollision();
-            return;
-        }
+        // if (this.speedX == 0 && this.speedY == 0) {
+        //     this.posX = this.owner.posX + this.owner.w/2 - this.w/2
+        // }
+        // if (this.type == "manual"){
+        //     this.setPos(this.posX, this.posY);
+        //     this.checkCollision();
+        //     return;
+        // }
         var unit = Math.sqrt(this.vectorX*this.vectorX + this.vectorY*this.vectorY);
         // console.log(this.container.left);
-        var moveX = this.vectorX/unit * this.speed;
-        var moveY = this.vectorY/unit * this.speed;
+        console.log(this);
+
+        // Gravity
+        this.speedY += this.vectorY == -1 ? -Ball.GRAVITY : Ball.GRAVITY;
+        var moveX = this.vectorX/unit * this.speedX;
+        var moveY = this.vectorY/unit * this.speedY;
         this.setPos(this.posX + moveX, this.posY + moveY);
         this.checkBoundary(moveX, moveY);
         this.checkCollision();
@@ -115,7 +133,9 @@ export class Ball extends GameObject {
         }
         if (this.posY + this.h/2 + toY > this.container.bottom) {
             this.vectorY = -this.vectorY;
-            this.setPos(this.owner.posX + this.owner.w/2 - this.w/2, this.owner.posY - this.h - 5);
+            this.setPos(this.owner.posX + this.owner.w/2 - this.w/2, this.owner.posY - this.owner.h + 5);
+            this.speedX = 0;
+            this.speedY = 0;
             this.owner.addScore(-10);
             this.flashOnDeath();
         }
@@ -140,8 +160,8 @@ export class Ball extends GameObject {
         var prevX = this.posX;
         var prevY = this.posY;
         if (this.type != "manual"){
-            this.posX += this.vectorX/unit * this.speed;
-            this.posY += this.vectorY/unit * this.speed;
+            this.posX += this.vectorX/unit * this.speedX;
+            this.posY += this.vectorY/unit * this.speedY;
         }
         for (var i = 0; i < GameObject.objectsArr.length; i++) {
             var obj = GameObject.objectsArr[i];
@@ -167,30 +187,30 @@ export class Ball extends GameObject {
                     var collision = 'none';
                     //Letters indicate the side of the object that was hit, not the ball
                     if(Math.abs(dx) <= width && Math.abs(dy) <= height){
-                        if (this.vectorX > 0 && this.vectorY > 0) {
-                            collision = crossWidth > crossHeight ? 'l' : 't';
-                            console.log(`left top ${collision}`);
-                        }
-                        if (this.vectorX < 0 && this.vectorY > 0) {
-                            collision = crossWidth>-(crossHeight) ? 'r' : 't';
-                            console.log(`right top ${collision}`);
-                        }
-                        if (this.vectorX < 0 && this.vectorY < 0) {
-                            collision = crossWidth > crossHeight ? 'b' : 'r';
-                            console.log(`bottom right ${collision}`);
-                        }
-                        if (this.vectorX > 0 && this.vectorY < 0) {
-                            collision = (crossWidth>-(crossHeight)) ? 'b' : 'l';
-                            console.log(`bottom left ${collision}`);
-                        }
+                        // if (this.vectorX > 0 && this.vectorY > 0) {
+                        //     collision = crossWidth > crossHeight ? 'l' : 't';
+                        //     console.log(`left top ${collision}`);
+                        // }
+                        // if (this.vectorX < 0 && this.vectorY > 0) {
+                        //     collision = crossWidth>-(crossHeight) ? 'r' : 't';
+                        //     console.log(`right top ${collision}`);
+                        // }
+                        // if (this.vectorX < 0 && this.vectorY < 0) {
+                        //     collision = crossWidth > crossHeight ? 'b' : 'r';
+                        //     console.log(`bottom right ${collision}`);
+                        // }
+                        // if (this.vectorX > 0 && this.vectorY < 0) {
+                        //     collision = (crossWidth>-(crossHeight)) ? 'b' : 'l';
+                        //     console.log(`bottom left ${collision}`);
+                        // }
                         //Old bounce check, doesn't account for the direction of the ball
                         //e.g. a ball moving down and right could bounce from the right wall
                         //the right wall could never be hit from that direction of movement
-                        // if(crossWidth > crossHeight) {
-                        //     collision = (crossWidth>-(crossHeight))?'b':'l';
-                        // } else {
-                        //     collision = (crossWidth>-(crossHeight))?'r':'t';
-                        // }
+                        if(crossWidth > crossHeight) {
+                            collision = (crossWidth>-(crossHeight))?'b':'l';
+                        } else {
+                            collision = (crossWidth>-(crossHeight))?'r':'t';
+                        }
                     }
 
                     switch(collision) {
@@ -215,11 +235,12 @@ export class Ball extends GameObject {
                             // offsetX = -this.vectorX/unit * this.speed * 1.05;
                         break;
                         default:
+                            console.log("POSRALO SA");
                             diffX = -1;
                             diffY = -1;
                     }
                     if (obj instanceof Player) {
-                        this.vectorX += 2*((this.posX + this.w/2) - (obj.posX + obj.w/2))/obj.w;
+                        // this.vectorX += 2*((this.posX + this.w/2) - (obj.posX + obj.w/2))/obj.w;
                         this.vectorY *= -1;
                         this.setPos(this.posX, obj.posY - this.h);
                     }
@@ -242,6 +263,7 @@ export class Ball extends GameObject {
                             // default:
                             //     this.setPos(this.posX + (prevX - this.posX), this.posY + (prevY - this.posY));
                         }
+                        this.speedY *= 0.95;
                     }
                     obj.collide(this);
                 //return here if only the first collision found should count

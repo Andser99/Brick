@@ -11,7 +11,7 @@ body {
 .player {
     background-color: darkmagenta;
     position: fixed;
-    bottom: 50px;
+    top: 50px;
     background-color: darkmagenta;
     text-align: center;
     border: inset 6px darkorchid;
